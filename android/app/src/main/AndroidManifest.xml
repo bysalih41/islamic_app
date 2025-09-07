@@ -5,7 +5,7 @@
         android:label="islamic_app"
         android:icon="@mipmap/ic_launcher">
 
-        <!-- Flutter V2 Embedding için zorunlu -->
+        <!-- Flutter V2 Embedding -->
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
