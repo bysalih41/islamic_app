@@ -8,13 +8,66 @@ workflows:
     scripts:
       - name: Prepare Android project
         script: |
+          # android iskeleti yoksa oluştur
           if [ ! -d "android" ]; then
             flutter create . --platforms=android
           fi
+
+          # Min/compile/target SDK ayarları (flutter_compass için minSdk 23)
+          sed -i.bak '/flutter.minSdkVersion/d' android/local.properties || true
+          sed -i.bak '/flutter.compileSdkVersion/d' android/local.properties || true
+          sed -i.bak '/flutter.targetSdkVersion/d' android/local.properties || true
+          echo "flutter.minSdkVersion=23" >> android/local.properties
+          echo "flutter.compileSdkVersion=34" >> android/local.properties
+          echo "flutter.targetSdkVersion=34" >> android/local.properties
+
           flutter pub get
+
+          # build.gradle içinde sabit minSdk varsa 23 yap
+          if grep -q "minSdkVersion" android/app/build.gradle; then
+            cp android/app/build.gradle android/app/build.gradle.bak || true
+            sed -i.bak 's/minSdkVersion *[0-9][0-9]*/minSdkVersion 23/g' android/app/build.gradle || true
+          fi
+
       - name: Build APK (release)
         script: |
           flutter clean
           flutter build apk --release
+
     artifacts:
       - build/app/outputs/flutter-apk/app-release.apk
+
+  android-aab:
+    name: Build Android AppBundle (Play Store)
+    max_build_duration: 60
+    environment:
+      flutter: 3.13.9
+      java: 17
+    scripts:
+      - name: Prepare Android project
+        script: |
+          if [ ! -d "android" ]; then
+            flutter create . --platforms=android
+          fi
+
+          sed -i.bak '/flutter.minSdkVersion/d' android/local.properties || true
+          sed -i.bak '/flutter.compileSdkVersion/d' android/local.properties || true
+          sed -i.bak '/flutter.targetSdkVersion/d' android/local.properties || true
+          echo "flutter.minSdkVersion=23" >> android/local.properties
+          echo "flutter.compileSdkVersion=34" >> android/local.properties
+          echo "flutter.targetSdkVersion=34" >> android/local.properties
+
+          flutter pub get
+
+          if grep -q "minSdkVersion" android/app/build.gradle; then
+            cp android/app/build.gradle android/app/build.gradle.bak || true
+            sed -i.bak 's/minSdkVersion *[0-9][0-9]*/minSdkVersion 23/g' android/app/build.gradle || true
+          fi
+
+      - name: Build AAB (release)
+        script: |
+          flutter clean
+          flutter build appbundle --release
+
+    artifacts:
+      - build/app/outputs/bundle/release/app-release.aab
