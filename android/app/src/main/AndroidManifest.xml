@@ -4,6 +4,12 @@
     <application
         android:label="islamic_app"
         android:icon="@mipmap/ic_launcher">
+
+        <!-- Flutter V2 Embedding için zorunlu -->
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
