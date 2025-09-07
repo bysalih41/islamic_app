@@ -3,12 +3,11 @@ workflows:
     name: Build Android APK
     max_build_duration: 60
     environment:
-      flutter: 3.13.9   # AGP 7.x ile uyumlu
+      flutter: 3.13.9
       java: 17
     scripts:
       - name: Prepare Android project
         script: |
-          # android/ yoksa oluştur
           if [ ! -d "android" ]; then
             flutter create . --platforms=android
           fi
@@ -19,24 +18,3 @@ workflows:
           flutter build apk --release
     artifacts:
       - build/app/outputs/flutter-apk/app-release.apk
-
-  android-aab:
-    name: Build Android AppBundle (Play Store)
-    max_build_duration: 60
-    environment:
-      flutter: 3.13.9
-      java: 17
-    scripts:
-      - name: Prepare Android project
-        script: |
-          # android/ yoksa oluştur
-          if [ ! -d "android" ]; then
-            flutter create . --platforms=android
-          fi
-          flutter pub get
-      - name: Build AAB (release)
-        script: |
-          flutter clean
-          flutter build appbundle --release
-    artifacts:
-      - build/app/outputs/bundle/release/app-release.aab
